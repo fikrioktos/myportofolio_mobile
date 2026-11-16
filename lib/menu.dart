@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+/// Model data untuk satu tombol aksi di halaman menu utama.
+///
+/// Menyimpan nama tombol (ditampilkan di kartu dan di pesan SnackBar),
+/// ikon Material yang relevan, serta warna latar khusus kartunya —
+/// sehingga pewarnaan tiap tombol tidak butuh logika percabangan.
 class ItemHomepage {
   final String name;
   final IconData icon;
@@ -8,6 +13,11 @@ class ItemHomepage {
   ItemHomepage(this.name, this.icon, this.color);
 }
 
+/// Halaman menu utama aplikasi portofolio.
+///
+/// StatelessWidget karena seluruh tampilannya murni fungsi dari data
+/// konstanta miliknya (NPM, nama, kelas, dan daftar tombol) — tidak ada
+/// state internal yang berubah sepanjang hidup halaman ini.
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
 
@@ -17,6 +27,7 @@ class MyHomePage extends StatelessWidget {
 
   final List<ItemHomepage> items = [
     ItemHomepage("Lihat Proyek", Icons.folder, Colors.blue),
+    ItemHomepage("Lihat Skills", Icons.build, Colors.orange),
     ItemHomepage("Tambah Proyek", Icons.add_circle, Colors.green),
     ItemHomepage("Logout", Icons.logout, Colors.red),
   ];
@@ -92,6 +103,10 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
+/// Kartu informasi identitas pemilik portofolio (NPM, nama, atau kelas).
+///
+/// Menampilkan pasangan [title]–[content] secara vertikal dengan lebar
+/// yang menyesuaikan sepertiga layar agar tiga kartu muat sejajar.
 class InfoCard extends StatelessWidget {
   // Kartu informasi yang menampilkan judul (title) dan isi (content).
   final String title;
@@ -124,6 +139,11 @@ class InfoCard extends StatelessWidget {
   }
 }
 
+/// Tombol aksi berbentuk kartu berwarna untuk menu portofolio.
+///
+/// Seluruh permukaan kartu bisa ditekan ([InkWell] dengan efek ripple di
+/// atas warna [ItemHomepage.color]); menekannya menampilkan SnackBar yang
+/// menyebut nama tombol yang ditekan.
 class ItemCard extends StatelessWidget {
   final ItemHomepage item;
 
