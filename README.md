@@ -7,8 +7,9 @@ portofolio beserta tombol aksi menu portofolio.
 ## Fitur (Tugas 7)
 
 - **InfoCard**: 3 kartu informasi di bagian atas halaman — NPM, Name, dan Class.
-- **ItemCard**: 3 tombol aksi dengan warna latar unik per tombol (Lihat Proyek, Tambah Proyek,
-  Logout). Setiap tombol menampilkan SnackBar "Kamu telah menekan tombol [Nama Tombol]!".
+- **ItemCard**: 4 tombol aksi dengan warna latar unik per tombol (Lihat Proyek, Lihat Skills,
+  Tambah Proyek, Logout). Setiap tombol menampilkan SnackBar "Kamu telah menekan tombol
+  [Nama Tombol]!".
 - Warna tombol didefinisikan lewat atribut `color` pada model `ItemHomepage` (tanpa if-else).
 - Halaman menu utama (`MyHomePage`) berupa `StatelessWidget`, dipisah ke `lib/menu.dart`.
 
@@ -106,6 +107,13 @@ lib/
    (Android/iOS), atau saat terjadi error state yang "hangat" setelah refactor besar (mis.
    mengubah superclass widget). Kalau cuma mengubah isi `build()`, warna, atau layout — hot
    reload cukup.
+
+## Progres Mingguan
+
+| Minggu | Pekerjaan |
+|---|---|
+| Tutorial 08 | Setup Flutter SDK, inisialisasi proyek `myportofolio_mobile`, pemisahan `menu.dart` dari `main.dart`, `MyHomePage` jadi `StatelessWidget`, penyusunan `InfoCard` dan `ItemCard`. |
+| Tugas 7 | Data diri diganti dari contoh Burhan ke identitas pribadi; atribut `Color` pada model `ItemHomepage` supaya tiap tombol punya warna unik tanpa if-else; README, jawaban reflektif, dan AI disclosure; penambahan tombol **Lihat Skills** sebagai fitur ekstra. |
 
 ## AI Disclosure
 
