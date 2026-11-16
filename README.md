@@ -128,4 +128,6 @@ lib/
 - **Keterbatasan AI & perbaikan manual**: AI tidak bisa menjalankan emulator untuk verifikasi
   visual, sehingga pengecekan tampilan akhir (warna kartu, SnackBar, layout layar sempit)
   tetap dilakukan manual oleh saya.
+- **Log prompt**: log verbatim prompt dan kutipan jawaban AI tersedia di
+  [docs/ai-log-tugas-7.md](docs/ai-log-tugas-7.md).
 
