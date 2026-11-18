@@ -50,8 +50,9 @@ class MyHomePage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       drawer: const LeftDrawer(),
-      // Body halaman utama dengan padding di sekelilingnya.
-      body: Padding(
+      // Body halaman utama dengan padding di sekelilingnya. SingleChildScrollView
+      // agar konten bisa di-scroll dan tidak overflow di layar kecil.
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
