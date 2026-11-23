@@ -84,6 +84,14 @@ class _CertificationFormPageState extends State<CertificationFormPage> {
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
+        // Tombol reset mengosongkan seluruh isian dan menghapus pesan error.
+        actions: [
+          IconButton(
+            tooltip: 'Reset formulir',
+            icon: const Icon(Icons.refresh),
+            onPressed: _resetForm,
+          ),
+        ],
       ),
       drawer: const LeftDrawer(),
       body: Form(
