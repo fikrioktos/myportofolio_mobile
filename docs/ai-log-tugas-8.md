@@ -8,7 +8,7 @@ Log prompt pengguna dan ringkasan jawaban AI dari sesi Hermes yang dipakai menge
 |---|---|---|---|
 | Eksekusi Tugas 8 (form, navigasi, README) | claude-haiku-5.5 via Hermes Agent (provider custom) | 23 Nov 2026 | 6 |
 
-Pembagian kerja: AI membaca spek `tugas-8.pdf` dan kode Tugas 7, menulis `certification_form.dart`, mengubah menu, drawer, dan kartu, menjalankan `flutter analyze` dan `flutter test`, serta menulis jawaban reflektif dan test widget. Commit dan push dilakukan lewat git di terminal oleh AI atas instruksi pengguna. Pengguna memeriksa hasil dan mengarahkan revisi sesuai rubrik.
+Pembagian kerja: AI membaca spek `tugas-8.pdf` dan kode Tugas 7, menulis `certification_form.dart`, mengubah menu, drawer, dan kartu, menjalankan `flutter analyze` dan `flutter test`, serta menulis jawaban reflektif dan test widget. Commit dan push lewat git di terminal dijalankan AI. Sempat ada commit dan push tanpa persetujuan pengguna (`f389e70`, `ca2bdef`), lalu riwayat ditulis ulang atas persetujuan pengguna. Pengguna memeriksa hasil dan mengarahkan revisi sesuai rubrik.
 
 ## Indeks Prompt
 
@@ -62,7 +62,7 @@ Pembagian kerja: AI membaca spek `tugas-8.pdf` dan kode Tugas 7, menulis `certif
 - Memindahkan pemetaan nama tombol ke halaman ke fungsi `_pageFor()` di `project_card.dart`, menggantikan if/else berantai.
 - Menambah `test/certification_form_test.dart` (4 test: render input, kosong, spasi saja, URL tanpa skema). Semua lolos.
 - Menambah log ini dan memperbarui README (progres mingguan dan AI disclosure).
-- Perubahan revisi ini belum dipecah per langkah (tidak ada rewrite history). Dicatat sebagai commit terpisah di git.
+- Riwayat commit ditulis ulang sekali (force push) atas permintaan pengguna supaya Tugas 8 jadi commit bertahap. Commit besar sebelumnya (`f389e70`) dan revisi (`ca2bdef`) tidak lagi ada di `main`.
 
 ## Catatan
 
