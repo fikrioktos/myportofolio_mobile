@@ -55,5 +55,21 @@ void main() {
       expect(find.text('URL harus diawali http:// atau https://!'),
           findsOneWidget);
     });
+    testWidgets('tombol reset mengosongkan isian dan menghapus pesan error',
+        (tester) async {
+      await tester.pumpWidget(_wrap());
+
+      await tester.enterText(find.byType(TextFormField).at(0), 'Dicoding');
+      await tester.tap(find.text('Simpan'));
+      await tester.pump();
+      expect(find.text('Lembaga penerbit tidak boleh kosong!'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Reset formulir'));
+      await tester.pump();
+
+      expect(find.text('Dicoding'), findsNothing);
+      expect(find.text('Lembaga penerbit tidak boleh kosong!'), findsNothing);
+      expect(find.text('Nama sertifikasi tidak boleh kosong!'), findsNothing);
+    });
   });
 }
