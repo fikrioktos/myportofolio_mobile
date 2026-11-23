@@ -3,11 +3,6 @@ import 'package:myportofolio_mobile/screens/menu.dart';
 import 'package:myportofolio_mobile/screens/certification_form.dart';
 import 'package:myportofolio_mobile/screens/project_form.dart';
 
-/// Tombol aksi berbentuk kartu berwarna untuk menu portofolio.
-///
-/// Seluruh permukaan kartu bisa ditekan ([InkWell] dengan efek ripple di
-/// atas warna [ItemHomepage.color]); menekannya menampilkan SnackBar yang
-/// menyebut nama tombol yang ditekan, lalu menavigasi ke halaman yang sesuai.
 /// Memetakan nama tombol aksi ke halaman tujuannya.
 ///
 /// Mengembalikan null untuk tombol yang belum punya halaman (mis. Lihat Proyek).
@@ -23,6 +18,11 @@ Widget? _pageFor(String name) {
   }
 }
 
+/// Tombol aksi berbentuk kartu berwarna untuk menu portofolio.
+///
+/// Seluruh permukaan kartu bisa ditekan ([InkWell] dengan efek ripple di
+/// atas warna [ItemHomepage.color]); menekannya menampilkan SnackBar yang
+/// menyebut nama tombol yang ditekan, lalu menavigasi ke halaman yang sesuai.
 class ItemCard extends StatelessWidget {
   final ItemHomepage item;
 
