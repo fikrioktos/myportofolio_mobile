@@ -260,6 +260,8 @@ class _CertificationFormPageState extends State<CertificationFormPage> {
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
+                        // Diambil sebelum dialog dibuka; context di dalam dialog tidak valid setelah ditutup.
+                        final messenger = ScaffoldMessenger.of(context);
                         showDialog(
                           context: context,
                           builder: (context) {
@@ -286,6 +288,11 @@ class _CertificationFormPageState extends State<CertificationFormPage> {
                                   onPressed: () {
                                     Navigator.pop(context);
                                     _resetForm();
+                                    messenger.showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Sertifikasi tersimpan'),
+                                      ),
+                                    );
                                   },
                                 ),
                               ],
