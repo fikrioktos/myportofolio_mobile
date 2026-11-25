@@ -77,10 +77,7 @@ class _CertificationFormPageState extends State<CertificationFormPage> {
       appBar: AppBar(
         title: const Text(
           'Add Certification Form',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
@@ -168,8 +165,10 @@ class _CertificationFormPageState extends State<CertificationFormPage> {
                     ),
                   ),
                   onTap: () async {
-                    final picked =
-                        await _pickDate(_issuedController, _issuedDate);
+                    final picked = await _pickDate(
+                      _issuedController,
+                      _issuedDate,
+                    );
                     if (picked != null) {
                       setState(() {
                         _issuedDate = picked;
@@ -199,8 +198,10 @@ class _CertificationFormPageState extends State<CertificationFormPage> {
                     ),
                   ),
                   onTap: () async {
-                    final picked =
-                        await _pickDate(_expiredController, _expiredDate);
+                    final picked = await _pickDate(
+                      _expiredController,
+                      _expiredDate,
+                    );
                     if (picked != null) {
                       setState(() {
                         _expiredDate = picked;
@@ -239,7 +240,8 @@ class _CertificationFormPageState extends State<CertificationFormPage> {
                       return null;
                     }
                     final uri = Uri.tryParse(value.trim());
-                    final isHttp = uri != null &&
+                    final isHttp =
+                        uri != null &&
                         (uri.scheme == 'http' || uri.scheme == 'https') &&
                         uri.host.isNotEmpty;
                     if (!isHttp) {
@@ -256,7 +258,9 @@ class _CertificationFormPageState extends State<CertificationFormPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
+                      backgroundColor: WidgetStateProperty.all(
+                        Theme.of(context).colorScheme.primary,
+                      ),
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
@@ -266,7 +270,9 @@ class _CertificationFormPageState extends State<CertificationFormPage> {
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              title: const Text('Sertifikasi berhasil ditambahkan!'),
+                              title: const Text(
+                                'Sertifikasi berhasil ditambahkan!',
+                              ),
                               content: SingleChildScrollView(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -274,11 +280,14 @@ class _CertificationFormPageState extends State<CertificationFormPage> {
                                     Text('Nama Sertifikasi: $_name'),
                                     Text('Lembaga Penerbit: $_issuer'),
                                     Text(
-                                        'Tanggal Terbit: ${_issuedDate == null ? '-' : _formatDate(_issuedDate!)}'),
+                                      'Tanggal Terbit: ${_issuedDate == null ? '-' : _formatDate(_issuedDate!)}',
+                                    ),
                                     Text(
-                                        'Tanggal Kedaluwarsa: ${_expiredDate == null ? '-' : _formatDate(_expiredDate!)}'),
+                                      'Tanggal Kedaluwarsa: ${_expiredDate == null ? '-' : _formatDate(_expiredDate!)}',
+                                    ),
                                     Text(
-                                        'URL Kredensial: ${_credentialUrl.isEmpty ? '-' : _credentialUrl}'),
+                                      'URL Kredensial: ${_credentialUrl.isEmpty ? '-' : _credentialUrl}',
+                                    ),
                                   ],
                                 ),
                               ),

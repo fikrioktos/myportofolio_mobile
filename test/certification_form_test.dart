@@ -21,8 +21,9 @@ void main() {
       expect(find.text('Simpan'), findsOneWidget);
     });
 
-    testWidgets('isian kosong menampilkan pesan error dan tidak ada dialog',
-        (tester) async {
+    testWidgets('isian kosong menampilkan pesan error dan tidak ada dialog', (
+      tester,
+    ) async {
       await tester.pumpWidget(_wrap());
 
       await tester.tap(find.text('Simpan'));
@@ -52,11 +53,14 @@ void main() {
       await tester.tap(find.text('Simpan'));
       await tester.pump();
 
-      expect(find.text('URL harus diawali http:// atau https://!'),
-          findsOneWidget);
+      expect(
+        find.text('URL harus diawali http:// atau https://!'),
+        findsOneWidget,
+      );
     });
-    testWidgets('tombol reset mengosongkan isian dan menghapus pesan error',
-        (tester) async {
+    testWidgets('tombol reset mengosongkan isian dan menghapus pesan error', (
+      tester,
+    ) async {
       await tester.pumpWidget(_wrap());
 
       await tester.enterText(find.byType(TextFormField).at(0), 'Dicoding');
