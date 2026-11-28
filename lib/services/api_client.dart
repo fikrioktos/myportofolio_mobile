@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:myportofolio_mobile/config.dart';
+import 'package:myportofolio_mobile/models/experience.dart';
 import 'package:myportofolio_mobile/models/project.dart';
 
 /// Exception ketika sebuah request API mengembalikan status non-2xx.
@@ -61,6 +62,72 @@ class ApiClient {
 
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;
     return Project.fromJson(decoded);
+  }
+
+  /// Mengambil seluruh pengalaman kerja (endpoint publik, tanpa autentikasi).
+  Future<List<Experience>> getExperiences() async {
+    final response = await _client.get(
+      _uri('/api/v1/experiences/'),
+      headers: const {'Accept': 'application/json'},
+    );
+    _ensureSuccess(response);
+
+    final decoded = jsonDecode(response.body) as List<dynamic>;
+    return decoded
+        .map((item) => Experience.fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Membuat pengalaman kerja baru (butuh token, superuser/editor).
+  Future<Experience> createExperience(
+    Experience experience, {
+    required String token,
+  }) async {
+    final response = await _client.post(
+      _uri('/api/v1/experiences/'),
+      headers: <String, String>{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Token $token',
+      },
+      body: jsonEncode(experience.toJson()),
+    );
+    _ensureSuccess(response);
+
+    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+    return Experience.fromJson(decoded);
+  }
+
+  /// Menghapus satu pengalaman kerja (butuh token, superuser).
+  Future<void> deleteExperience(String id, {required String token}) async {
+    final response = await _client.delete(
+      _uri('/api/v1/experiences/$id/'),
+      headers: <String, String>{
+        'Accept': 'application/json',
+        'Authorization': 'Token $token',
+      },
+    );
+    _ensureSuccess(response);
+  }
+
+  /// Memperbarui sebagian pengalaman kerja (PATCH, butuh token).
+  Future<Experience> updateExperience(
+    Experience experience, {
+    required String token,
+  }) async {
+    final id = experience.id;
+    assert(id != null, 'updateExperience membutuhkan id dari server');
+    final request = http.Request('PATCH', _uri('/api/v1/experiences/$id/'))
+      ..headers['Accept'] = 'application/json'
+      ..headers['Content-Type'] = 'application/json; charset=UTF-8'
+      ..headers['Authorization'] = 'Token $token'
+      ..body = jsonEncode(experience.toJson());
+    final streamed = await _client.send(request);
+    final response = await http.Response.fromStream(streamed);
+    _ensureSuccess(response);
+
+    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+    return Experience.fromJson(decoded);
   }
 
   /// Menukar username + password dengan token autentikasi.
