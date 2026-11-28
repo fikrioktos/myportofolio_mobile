@@ -1,11 +1,29 @@
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:myportofolio_mobile/screens/certification_form.dart';
+import 'package:myportofolio_mobile/services/api_client.dart';
+import 'package:myportofolio_mobile/services/auth_state.dart';
+import 'package:provider/provider.dart';
 
-/// Membungkus form dalam MaterialApp supaya Theme, Navigator, dan
-/// ScaffoldMessenger tersedia seperti saat aplikasi berjalan.
+/// Membungkus form dalam MultiProvider supaya Theme, Navigator,
+/// ScaffoldMessenger, ApiClient, dan AuthState tersedia seperti saat
+/// aplikasi berjalan. Token awal diisi agar ensureLoggedIn langsung
+/// mengembalikan true tanpa membuka layar login.
 Widget _wrap() {
-  return const MaterialApp(home: CertificationFormPage());
+  final client = ApiClient(
+    client: MockClient((request) async => http.Response('[]', 200)),
+  );
+  return MultiProvider(
+    providers: [
+      Provider.value(value: client),
+      ChangeNotifierProvider(
+        create: (context) => AuthState(client, initialToken: 'test-token'),
+      ),
+    ],
+    child: const MaterialApp(home: CertificationFormPage()),
+  );
 }
 
 void main() {

@@ -16,7 +16,9 @@ void main() {
 
     expect(find.text('MyPortfolio'), findsWidgets);
     expect(find.text('Lihat Proyek'), findsOneWidget);
+    expect(find.text('Lihat Experience'), findsOneWidget);
     expect(find.text('Tambah Proyek'), findsOneWidget);
+    expect(find.text('Tambah Experience'), findsOneWidget);
     expect(find.text('Tambah Sertifikasi'), findsOneWidget);
     expect(find.text('Logout'), findsOneWidget);
   });
