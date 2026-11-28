@@ -1,11 +1,17 @@
 import 'package:material_ui/material_ui.dart';
+
+import 'package:myportofolio_mobile/widgets/auth_guard.dart';
 import 'package:myportofolio_mobile/widgets/left_drawer.dart';
 
 /// Halaman formulir untuk menambahkan sertifikasi baru.
 ///
 /// StatefulWidget karena nilai isian dan tanggal yang dipilih berubah
 /// selama pengguna mengetik. Validasi dijalankan lewat [GlobalKey] pada
-/// [Form] saat tombol Simpan ditekan.
+/// [Form] saat tombol Simpan ditekan. Pembukaan layar ini di menu/drawer
+/// dan pengiriman formulirnya memerlukan autentikasi lewat [ensureLoggedIn]
+/// (pola integrasi backend Tutorial 10; endpoint DRF khusus sertifikasi
+/// belum ada di backend, jadi penyimpanan saat ini masih berupa dialog
+/// konfirmasi lokal — baca README Tugas 9).
 class CertificationFormPage extends StatefulWidget {
   const CertificationFormPage({super.key});
 
@@ -262,53 +268,55 @@ class _CertificationFormPageState extends State<CertificationFormPage> {
                         Theme.of(context).colorScheme.primary,
                       ),
                     ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // Diambil sebelum dialog dibuka; context di dalam dialog tidak valid setelah ditutup.
-                        final messenger = ScaffoldMessenger.of(context);
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text(
-                                'Sertifikasi berhasil ditambahkan!',
+                    onPressed: () async {
+                      if (!_formKey.currentState!.validate()) return;
+                      // Pengiriman formulir memerlukan autentikasi.
+                      if (!await ensureLoggedIn(context)) return;
+                      if (!context.mounted) return;
+                      // Diambil sebelum dialog dibuka; context di dalam dialog tidak valid setelah ditutup.
+                      final messenger = ScaffoldMessenger.of(context);
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text(
+                              'Sertifikasi berhasil ditambahkan!',
+                            ),
+                            content: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Nama Sertifikasi: $_name'),
+                                  Text('Lembaga Penerbit: $_issuer'),
+                                  Text(
+                                    'Tanggal Terbit: ${_issuedDate == null ? '-' : _formatDate(_issuedDate!)}',
+                                  ),
+                                  Text(
+                                    'Tanggal Kedaluwarsa: ${_expiredDate == null ? '-' : _formatDate(_expiredDate!)}',
+                                  ),
+                                  Text(
+                                    'URL Kredensial: ${_credentialUrl.isEmpty ? '-' : _credentialUrl}',
+                                  ),
+                                ],
                               ),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Nama Sertifikasi: $_name'),
-                                    Text('Lembaga Penerbit: $_issuer'),
-                                    Text(
-                                      'Tanggal Terbit: ${_issuedDate == null ? '-' : _formatDate(_issuedDate!)}',
+                            ),
+                            actions: [
+                              TextButton(
+                                child: const Text('OK'),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  _resetForm();
+                                  messenger.showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Sertifikasi tersimpan'),
                                     ),
-                                    Text(
-                                      'Tanggal Kedaluwarsa: ${_expiredDate == null ? '-' : _formatDate(_expiredDate!)}',
-                                    ),
-                                    Text(
-                                      'URL Kredensial: ${_credentialUrl.isEmpty ? '-' : _credentialUrl}',
-                                    ),
-                                  ],
-                                ),
+                                  );
+                                },
                               ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _resetForm();
-                                    messenger.showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Sertifikasi tersimpan'),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
+                            ],
+                          );
+                        },
+                      );
                     },
                     child: const Text(
                       "Simpan",

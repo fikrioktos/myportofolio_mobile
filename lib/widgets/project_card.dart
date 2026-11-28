@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 
 import 'package:myportofolio_mobile/screens/certification_form.dart';
+import 'package:myportofolio_mobile/screens/experience_form.dart';
+import 'package:myportofolio_mobile/screens/experience_list_screen.dart';
 import 'package:myportofolio_mobile/screens/menu.dart';
 import 'package:myportofolio_mobile/screens/project_form.dart';
 import 'package:myportofolio_mobile/screens/project_list_screen.dart';
@@ -14,8 +16,12 @@ Widget? _pageFor(String name) {
   switch (name) {
     case "Lihat Proyek":
       return const ProjectListScreen();
+    case "Lihat Experience":
+      return const ExperienceListScreen();
     case "Tambah Proyek":
       return const ProjectFormPage();
+    case "Tambah Experience":
+      return const ExperienceFormPage();
     case "Tambah Sertifikasi":
       return const CertificationFormPage();
     default:
@@ -24,7 +30,11 @@ Widget? _pageFor(String name) {
 }
 
 /// Nama tombol yang butuh login sebelum halamannya dibuka.
-const _protectedActions = {"Tambah Proyek", "Tambah Sertifikasi"};
+const _protectedActions = {
+  "Tambah Proyek",
+  "Tambah Experience",
+  "Tambah Sertifikasi",
+};
 
 /// Tombol aksi berbentuk kartu berwarna untuk menu portofolio.
 ///
