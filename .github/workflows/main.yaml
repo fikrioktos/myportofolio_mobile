@@ -30,9 +30,11 @@ jobs:
           cache: true
       # Kompilasi APK release; base URL API bisa diarahkan ke backend
       # yang sudah di-deploy lewat repository variable API_BASE_URL.
+      # Fallback ke URL deploy PWS agar --dart-define tidak pernah kosong
+      # (nilai kosong menimpa defaultValue di String.fromEnvironment).
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
-      - run: flutter build apk --release --dart-define=API_BASE_URL=${{ vars.API_BASE_URL }}
+      - run: flutter build apk --release --dart-define=API_BASE_URL=${{ vars.API_BASE_URL || 'https://fikri-okto-myportofolio.pws.cs.ui.ac.id' }}
       - uses: actions/upload-artifact@v4
         with:
           name: app-release-apk

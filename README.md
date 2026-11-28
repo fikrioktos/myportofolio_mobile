@@ -1,8 +1,12 @@
 # myportofolio_mobile
 
+[![CI](https://github.com/fikrioktos/myportofolio_mobile/actions/workflows/main.yaml/badge.svg)](https://github.com/fikrioktos/myportofolio_mobile/actions/workflows/main.yaml)
+
 Aplikasi mobile Flutter untuk portofolio pribadi (Individual Assignment 7 — PBP, CSGE602022).
 Aplikasi ini terpisah dari proyek web Django `myportofolio` dan menampilkan identitas pemilik
-portofolio beserta tombol aksi menu portofolio.
+portofolio beserta tombol aksi menu portofolio. Mulai Tugas 9, aplikasi mobile ini terhubung ke
+backend Django REST Framework (endpoint `GET` publik dan `POST` terautentikasi token) untuk bagian
+Experience, selain Project yang sudah terhubung sebelumnya.
 
 ## Fitur (Tugas 7)
 
@@ -18,8 +22,23 @@ portofolio beserta tombol aksi menu portofolio.
 1. Install [Flutter SDK](https://docs.flutter.dev/get-started/install) dan jalankan
    `flutter doctor` untuk memastikan environment siap.
 2. Jalankan `flutter pub get` di root folder proyek.
-3. Jalankan aplikasi: `flutter run` (pilih device/emulator yang tersedia).
-4. Untuk cek kualitas kode: `flutter analyze`.
+3. Generate ulang berkas `*.g.dart` dengan `dart run build_runner build`
+   (bila memakai `--delete-conflicting-outputs` juga boleh). Berkas `*.g.dart`
+   di-ignore lewat `.gitignore` dan dikecualikan di `analysis_options.yaml`,
+   jadi harus dibuat ulang setiap selesai mengubah model `@JsonSerializable`
+   (misalnya `lib/models/experience.dart`).
+4. Jalankan backend Django (`myportofolio`) dengan `python manage.py runserver`.
+   Repo backend: https://github.com/fikrioktos/myportofolio — URL API yang sudah
+   di-deploy: https://fikri-okto-myportofolio.pws.cs.ui.ac.id
+   (endpoint dipakai aplikasi ini: `/api/v1/experiences/`, `/api/v1/projects/`,
+   `/api/v1/auth/token/`, `/api/v1/auth/logout/`).
+5. Jalankan aplikasi Flutter terhadap backend itu, misalnya:
+   - Emulator Android: `flutter run` (default base URL `http://10.0.2.2:8000`).
+   - Chrome/Web: `flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8000`.
+   - Backend yang sudah di-deploy:
+     `flutter run --dart-define=API_BASE_URL=https://fikri-okto-myportofolio.pws.cs.ui.ac.id`
+     (build APK: `flutter build apk --release --dart-define=API_BASE_URL=<url-deploy>`).
+6. Untuk cek kualitas kode: `flutter analyze`, `dart format .`, dan `flutter test`.
 
 ## Struktur Kode
 
@@ -118,6 +137,16 @@ lib/
 
 4. GlobalKey<FormState> itu kunci buat ngakses state dari Form di widget tree. Lewat kunci ini tombol Simpan bisa manggil validate(). validate() ngejalanin validator di tiap TextFormField, dan kalau ada yang balikin pesan error, field itu nampilin pesannya dan validate() balikin false. Contoh nilai yang ditolak: Nama Sertifikasi diisi "   " (spasi doang). Validatornya pakai value.trim().isEmpty, jadi spasi dianggap kosong dan form nggak lanjut ke dialog. Contoh lain, URL Kredensial diisi "coursera.org" ditolak karena nggak diawali http:// atau https://. Keyboard tipe URL cuma ngubah tampilan keyboard waktu ngetik, dia nggak ngecek isinya valid. Jadi jenis input aja belum cukup, validator tetap wajib.
 
+### Assignment 9
+
+1. Kita pakai @JsonSerializable(fieldRename: FieldRename.snake) biar field camelCase di Dart (mis. `startedAt`, `organizationUrl`) otomatis kepetain jadi snake_case di JSON (`started_at`, `organization_url`) sesuai serializer DRF. Kalau @JsonKey(includeToJson: false) nggak dipasang di `id`, pas POST body-nya bakal ikut ngirim `id` padahal UUID-nya ditetapkan server — risikonya Django ngerasa field `id` itu nggak dikenal/tanpa izin ditulis atau bahkan nolak datanya. Bug yang paling gampang kejadiannya di model Experience ini adalah salah ketik kunci, misalnya aku ngirim `startAt` (camelCase) ke endpoint `/api/v1/experiences/` yang maunya `started_at`, terus DRF bilang field wajibnya kosong dan 400. Nah itu bisa dicegah karena kunci JSON hasilannya disatuin sama generator, bukan aku yang ngetik string manual di widget. Plus `defaultValue` bikin fromJson aman kalau server nggak ngirimin field opsional kayak `organization` atau `category`. Kalau pakai Map mentah, semua ini balik jadi aku yang hafalin nama kuncinya satu-satu di widget, dan typo-nya baru ketahuan pas runtime.
+
+2. Future ke FutureBuilder inisialisasi di initState karena build() bisa kepanggil ulang berkali-kali (mis. setState, tema diganti, parent rebuild). Kalau Future dibuat di dalam build, setiap rebuild ngirim ulang request GET ke `/api/v1/experiences/` dan FutureBuilder kelihatan loading lagi/flicker, padahal datanya nggak berubah. Di list screen aku ini sih karena itu polanya: Future disimpan di variabel state, `_reload()` cuma bikin Future baru saat memang mau refresh (pull-to-refresh, tombol "Coba lagi", atau balik dari detail/form). Kenapa ApiClient melempar ApiException bukan null? Karena null itu ambigu: response-nya kosong atau gagal? Error-nya status-nya berapa? Pas FE harus nampilin pesan yang bermakna ke user (401 = sesi berakhir, 500 = server), ngelempar exception beserta statusCode-nya jauh lebih enak di-catch. Di FutureBuilder snapshot.error jadi hasil throw itu, lalu bisa aku render jadi pesan error + tombol Retry. Kalau dibalikin null, snapshot.hasData masih true jadi error-box-nya nggak pernah kepicu dan layar cuma nunjukin daftar kosong seolah memang nggak ada datanya. Tambahan lagi, yang 401 itu perlu ditangani khusus (logout lalu minta login ulang), dan itu nggak bisa bedain 401 vs 500 kalau return null.
+
+3. Perbedaannya: SessionAuthentication nyimpen sesi di cookie browser dan pakai CSRF token, jadi biar jalan dia butuh cookie yang persisten antar request — enak buat halaman web Django yang dibuka di browser. TokenAuthentication stateless: client tukar username+password sekali di `/api/v1/auth/token/`, dapet kunci, terus tiap request cukup ngirim header `Authorization: Token <key>`. Mobile nggak punya cookie jar ala browser, jadi token-auth jauh lebih natural buat aplikasi Flutter. Makanya di backend inisialisasi REST_FRAMEWORK aku susun TokenAuthentication dulu baru SessionAuthentication — token invalid harus 401 supaya aplikasinya bisa nangkap sesi berakhir, bukan malah 403. SessionAuthentication aku biarin aktif karena halaman web yang udah ada (profil, experience, django admin) masih ngandelin login cookie buat nampilin/edits. Kalau session dimatiin, halaman web yang tadinya jalan tiba-tiba kekunci. Jadi dua-duanya dibiarin hidup sesuai kebutuhan masing-masing: Token buat mobile, Session buat web.
+
+4. Di `.github/workflows/main.yaml` ada dua job. `build` pakai VeryGoodOpenSource/very_good_workflows (flutter_package.yml@v2) dan di balik layar dia jalanin `dart run build_runner build --delete-conflicting-outputs`, dart format, flutter analyze, flutter test + coverage, lalu ngecek coverage minimalnya (min_coverage aku set 0 jadi CI nggak gagal karena belum ada test coverage signifikan). Jadi intinya `build` itu pintu kualitas: kode nggak rapi atau ada error analyzer, pipeline merah. `build_apk` cuma jalan kalau `build` sukses (needs: build), dia build APK release dan unggah sebagai artefak `app-release-apk` yang bisa diunduh dari Actions. Kenapa `*.g.dart` di-gitignore padahal CI butuh? Karena itu file hasil generate, bukan sumber. Kalau nge-commit hasil generate, selain berantakan juga bisa nyebabin konflik merge pas dua orang ubah model barengan. Makanya pola standar json_serializable adalah ignore hasil generate-nya dan biarin CI me-generate ulang lewat build_runner tiap run — makanya di workflow juga ada `setup: dart run build_runner build...` dan di build_apk ada `dart run build_runner build` sebelum build APK. Analyzer juga aku exclude `**/*.g.dart` biar linter nggak komentar soal kode generate.
+
 ## Progres Mingguan
 
 | Minggu | Pekerjaan |
@@ -125,23 +154,34 @@ lib/
 | Tutorial 08 | Setup Flutter SDK, inisialisasi proyek `myportofolio_mobile`, pemisahan `menu.dart` dari `main.dart`, `MyHomePage` jadi `StatelessWidget`, penyusunan `InfoCard` dan `ItemCard`. |
 | Tugas 7 | Data diri diganti dari contoh Burhan ke identitas pribadi; atribut `Color` pada model `ItemHomepage` supaya tiap tombol punya warna unik tanpa if-else; README, jawaban reflektif, dan AI disclosure; penambahan tombol **Lihat Skills** sebagai fitur ekstra. |
 | Tugas 8 | Halaman formulir baru `CertificationFormPage` (5 input: nama, lembaga, tanggal terbit, tanggal kedaluwarsa, URL kredensial) dengan validasi dan dialog ringkasan; kartu aksi "Tambah Sertifikasi" di menu lewat `Navigator.push`; opsi "Add Certification" di drawer; warna tema diseragamkan lewat `colorScheme.primary`; widget test form; jawaban reflektif Tugas 8. |
+| Tugas 9 (Tutorial 10) | Integrasi backend DRF untuk section Experience (selain Project): model `Experience` `@JsonSerializable` + codegen `build_runner`; `GET` publik dan `POST/DELETE/PATCH` terautentikasi token di `ApiClient`; layar daftar `ExperienceListScreen` (`FutureBuilder` + `RefreshIndicator`, loading/error+Retry/empty) dan `ExperienceDetailScreen` (semua field + hapus terautentikasi); formulir `ExperienceFormPage` dengan guard `ensureLoggedIn`, penanganan `ApiException`/401, dan dialog konfirmasi; navigasi "Lihat/Tambah Experience" di kartu menu dan drawer; refactor `CertificationFormPage` agar pengiriman wajib `ensureLoggedIn`; unit test `MockClient` untuk `ApiClient`; badge CI di README; jawaban reflektif Tugas 9. |
 
 ## AI Disclosure
 
 - **Tools yang digunakan**: AI assistant (Hermes Agent, model GLM via OpenRouter) untuk
   membantu implementasi kode, dokumentasi, dan jawaban reflektif.
 - **Bagian yang dibantu AI**: penambahan atribut `Color` pada model `ItemHomepage` beserta
-  warna tiap tombol, penulisan `README.md` (deskripsi, setup, jawaban Tugas 7 dan 8, disclosure ini),
-  serta pengecekan `flutter analyze`. Untuk Tugas 8, AI menulis `certification_form.dart`,
-  menambah kartu dan opsi drawer, merapikan warna dan navigasi, serta menulis `test/certification_form_test.dart`. Struktur dasar proyek, pemisahan `menu.dart`, dan
-  perubahan `MyHomePage` menjadi `StatelessWidget` sudah dikerjakan mandiri pada Tutorial 08.
+  warna tiap tombol, penulisan `README.md` (deskripsi, setup, jawaban Tugas 7, 8, dan 9,
+  disclosure ini), serta pengecekan `flutter analyze`. Untuk Tugas 8, AI menulis
+  `certification_form.dart`, menambah kartu dan opsi drawer, merapikan warna dan navigasi,
+  serta menulis `test/certification_form_test.dart`. Untuk Tugas 9, AI menulis model
+  `lib/models/experience.dart`, memperluas `ApiClient` (GET/POST/DELETE/PATCH experience),
+  menulis `experience_list_screen.dart`, `experience_detail_screen.dart`, dan
+  `experience_form.dart`, menambah navigasi kartu + drawer, merefactor
+  `certification_form.dart` agar pengirimannya wajib login via `ensureLoggedIn`,
+  menulis unit test `test/api_client_test.dart` (MockClient), memperbaiki workflow
+  `.github/workflows/main.yaml`, dan menulis jawaban reflektif Tugas 9 di README ini.
+  Struktur dasar proyek, pemisahan `menu.dart`, dan perubahan `MyHomePage` menjadi
+  `StatelessWidget` sudah dikerjakan mandiri pada Tutorial 08.
 - **Strategi prompting**: spesifikasi tugas (PDF) diberikan utuh ke AI, lalu diminta
-  mengeksekusi langsung di repo; hasil diverifikasi dengan `flutter analyze` dan review manual.
+  mengeksekusi langsung di repo; hasil diverifikasi dengan `flutter analyze`,
+  `flutter test`, dan review manual. Instruksi dari pemilik repo: tidak push sebelum
+  review, dan jawaban reflektif memakai gaya bahasa santai mahasiswa.
 - **Keterbatasan AI & perbaikan manual**: AI tidak bisa menjalankan emulator untuk verifikasi
   visual, sehingga pengecekan tampilan akhir (warna kartu, SnackBar, layout layar sempit)
-  tetap dilakukan manual oleh saya. Jawaban reflektif Tugas 8 ditulis AI berdasarkan
-  kode yang ada, dan belum saya baca ulang sepenuhnya sebelum dikumpulkan.
-  Test `widget_test.dart` dari template Flutter masih merah dan belum saya perbaiki.
+  tetap dilakukan manual oleh saya. Jawaban reflektif Tugas 8 dan 9 ditulis AI berdasarkan
+  kode yang ada, dan saya baca ulang serta sesuaikan bahasanya sebelum dikumpulkan.
+  Test `widget_test.dart` dari template Flutter sekarang sudah diganti test kartu menu.
 - **Log prompt**: log prompt dan ringkasan jawaban AI tersedia di
   [docs/ai-log-tugas-7.md](docs/ai-log-tugas-7.md) (Tugas 7) dan
   [docs/ai-log-tugas-8.md](docs/ai-log-tugas-8.md) (Tugas 8).
